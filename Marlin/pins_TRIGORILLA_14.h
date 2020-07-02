@@ -130,10 +130,10 @@
 #endif // #if TRIGORILLA_VERSION
 
 #if defined(ANYCUBIC_TFT_MODEL) || defined(REPRAP_DISCOUNT_SMART_CONTROLLER)
-  #define BEEPER_PIN       31
+  #define BEEPER_PIN       37
   #define SD_DETECT_PIN    49
 #else
-  #define BEEPER_PIN       31
+  #define BEEPER_PIN       37
   #define SD_DETECT_PIN    -1
 #endif
 
