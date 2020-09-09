@@ -647,4 +647,13 @@ void do_blocking_move_to_xy(const float &rx, const float &ry, const float &fr_mm
   FORCE_INLINE bool position_is_reachable_by_probe(const float &rx, const float &ry) { return position_is_reachable(rx, ry); }
 #endif
 
+#if ENABLED(FULL_M73_SUPPORT)
+  #define PRINT_PERCENT_DONE_INIT   0xff
+  #define PRINT_TIME_REMAINING_INIT 0xffff
+
+  //estimated time to end of the print
+  extern uint8_t print_percent_done_normal;
+  extern uint16_t print_time_remaining_normal;
+#endif
+
 #endif // MARLIN_H

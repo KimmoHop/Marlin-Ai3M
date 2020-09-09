@@ -8240,6 +8240,36 @@ inline void gcode_M42() {
   }
 #endif // ULTRA_LCD && LCD_SET_PROGRESS_MANUALLY
 
+#if ENABLED(FULL_M73_SUPPORT)
+
+  // storing estimated time to end of print counted by slicer
+  uint8_t print_percent_done_normal = PRINT_PERCENT_DONE_INIT;
+  uint16_t print_time_remaining_normal = PRINT_TIME_REMAINING_INIT; //estimated remaining print time in minutes
+
+/*!
+	### M73 - Set/get print progress <a href="https://reprap.org/wiki/G-code#M73:_Set.2FGet_build_percentage">M73: Set/Get build percentage</a>
+	#### Usage
+    
+	    M73 [ P | R | Q | S ]
+    
+	#### Parameters
+    - `P` - Percent in normal mode
+    - `R` - Time remaining in normal mode
+    No support for silent mode (Prusa)
+   */
+	inline void gcode_M73() {
+    if (parser.seen('P')) {
+      print_percent_done_normal = parser.byteval('P', PRINT_PERCENT_DONE_INIT);
+      NOMORE(print_percent_done_normal, 100);
+    }
+
+    if (parser.seen('R')) {
+      print_time_remaining_normal = parser.ushortval('R', PRINT_TIME_REMAINING_INIT);
+      NOMORE(print_time_remaining_normal, 65535);
+    }
+	}
+#endif
+
 /**
  * M75: Start print timer
  */
@@ -9022,6 +9052,11 @@ inline void gcode_M18_M84() {
     #if ENABLED(AUTO_BED_LEVELING_UBL) && ENABLED(ULTIPANEL)  // Only needed with an LCD
       if (ubl.lcd_map_control) ubl.lcd_map_control = defer_return_to_status = false;
     #endif
+
+    #if ENABLED(FULL_M73_SUPPORT)
+      print_time_remaining_normal = PRINT_TIME_REMAINING_INIT;
+      print_percent_done_normal = PRINT_PERCENT_DONE_INIT;
+    #endif
   }
 }
 
@@ -9290,7 +9325,7 @@ inline void gcode_M115() {
 
     // BUILD_PERCENT (M73)
     cap_line(PSTR("BUILD_PERCENT")
-      #if ENABLED(LCD_SET_PROGRESS_MANUALLY)
+      #if ENABLED(LCD_SET_PROGRESS_MANUALLY) || ENABLED(FULL_M73_SUPPORT)
         , true
       #endif
     );
@@ -12930,7 +12965,7 @@ void process_parsed_command() {
         case 49: gcode_M49(); break;                              // M49: Toggle the G26 Debug Flag
       #endif
 
-      #if ENABLED(ULTRA_LCD) && ENABLED(LCD_SET_PROGRESS_MANUALLY)
+      #if (ENABLED(ULTRA_LCD) && ENABLED(LCD_SET_PROGRESS_MANUALLY)) || ENABLED(FULL_M73_SUPPORT)
         case 73: gcode_M73(); break;                              // M73: Set Print Progress %
       #endif
       case 75: gcode_M75(); break;                                // M75: Start Print Job Timer

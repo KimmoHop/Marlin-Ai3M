@@ -293,7 +293,7 @@ static void lcd_implementation_status_screen() {
     }
   #endif // SDSUPPORT
 
-  #if ENABLED(SDSUPPORT) || ENABLED(LCD_SET_PROGRESS_MANUALLY)
+  #if (ENABLED(SDSUPPORT) || ENABLED(LCD_SET_PROGRESS_MANUALLY)) && DISABLED(FULL_M73_SUPPORT)
     //
     // Progress bar frame
     //
@@ -356,6 +356,33 @@ static void lcd_implementation_status_screen() {
     }
 
   #endif // SDSUPPORT || LCD_SET_PROGRESS_MANUALLY
+  
+  #if ENABLED(FULL_M73_SUPPORT)
+    #define PROGRESS_NUMBER_X 55
+    #define SD_TIME_X 96
+
+    if (PAGE_CONTAINS(42, 49)) {
+
+      uint8_t progress = PRINT_PERCENT_DONE_INIT;
+      if (print_percent_done_normal != PRINT_PERCENT_DONE_INIT) {
+        progress = print_percent_done_normal;
+      } else if (IS_SD_PRINTING()) {
+        progress = card.percentDone();
+      }
+      if (progress != PRINT_PERCENT_DONE_INIT) {
+        u8g.setPrintPos(PROGRESS_NUMBER_X, 49);
+          u8g.print(itostr3(progress));
+          u8g.print('%');
+      }
+
+       char buffer[10];
+      duration_t elapsed = print_job_timer.duration();
+      bool has_days = (elapsed.value >= 60*60*24L);
+      uint8_t len = elapsed.toDigital(buffer, has_days);
+      u8g.setPrintPos(SD_TIME_X, 49);
+      lcd_print(buffer);
+    }
+  #endif // FULL_M73_SUPPORT
 
   //
   // XYZ Coordinates
@@ -410,15 +437,44 @@ static void lcd_implementation_status_screen() {
         u8g.setColorIndex(0); // white on black
       #endif
 
-      u8g.setPrintPos(0 * XYZ_SPACING + X_LABEL_POS, XYZ_BASELINE);
-      lcd_printPGM(PSTR(MSG_X));
-      u8g.setPrintPos(0 * XYZ_SPACING + X_VALUE_POS, XYZ_BASELINE);
-      _draw_axis_value(X_AXIS, xstring, blink);
+      #if ENABLED(FULL_M73_SUPPORT)
+        if (print_time_remaining_normal != PRINT_TIME_REMAINING_INIT) {
+          uint16_t print_t = print_time_remaining_normal;
+          if (feedrate_percentage != 0) print_t = 100ul * print_t / feedrate_percentage;
+      
+          u8g.setPrintPos(0 * XYZ_SPACING + X_LABEL_POS, XYZ_BASELINE);
 
-      u8g.setPrintPos(1 * XYZ_SPACING + X_LABEL_POS, XYZ_BASELINE);
-      lcd_printPGM(PSTR(MSG_Y));
-      u8g.setPrintPos(1 * XYZ_SPACING + X_VALUE_POS, XYZ_BASELINE);
-      _draw_axis_value(Y_AXIS, ystring, blink);
+          char buffer[15];
+          uint16_t hh = print_t / 60;
+          uint8_t mm = print_t % 60;
+          char suff_doubt = feedrate_percentage != 100 ? '?': ' ';
+          bool has_days = print_t > (60*24);
+
+          if (has_days) {
+            uint16_t dd = print_t / 60 / 24;
+            sprintf_P(buffer, PSTR("%c %ud %2uh %c"), LCD_STR_CLOCK[0], dd, hh % 24, suff_doubt); // max 11
+          } else {
+            sprintf_P(buffer, PSTR("%c %2uh %02um %c"), LCD_STR_CLOCK[0], hh, mm, suff_doubt); // max 11
+          }
+          lcd_print(buffer);
+          
+        } else {
+
+      #endif
+
+        u8g.setPrintPos(0 * XYZ_SPACING + X_LABEL_POS, XYZ_BASELINE);
+        lcd_printPGM(PSTR(MSG_X));
+        u8g.setPrintPos(0 * XYZ_SPACING + X_VALUE_POS, XYZ_BASELINE);
+        _draw_axis_value(X_AXIS, xstring, blink);
+
+        u8g.setPrintPos(1 * XYZ_SPACING + X_LABEL_POS, XYZ_BASELINE);
+        lcd_printPGM(PSTR(MSG_Y));
+        u8g.setPrintPos(1 * XYZ_SPACING + X_VALUE_POS, XYZ_BASELINE);
+        _draw_axis_value(Y_AXIS, ystring, blink);
+
+      #if ENABLED(FULL_M73_SUPPORT)
+        }
+      #endif
 
       u8g.setPrintPos(2 * XYZ_SPACING + X_LABEL_POS, XYZ_BASELINE);
       lcd_printPGM(PSTR(MSG_Z));
