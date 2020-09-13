@@ -7,22 +7,35 @@ Forked from [Anycubic i3 Mega / Mega-S Marlin 1.1.9 by davidramiro](https://gith
 - Anycubic TFT display disabled
 - RepRapDiscoun full graphics enabled
 - SPI delay adjusted for clone with long cables
-- Serial buffers adjusted for lesser memory usage (86 bytes... :/ )
+- Serial buffers adjusted for lesser memory usage
+- M73 R support, displayed instead of X and Y cordinates
+- Manual level corners (moves from corner to corner)
+
+## Still works
+
+- Filament sensor
+- Manual mesh bed levelling, but a lot easier with "standard" display
 
 ## Bugs
 
-- It's possible that filament sensor does not work
+- Still no power out resume
 
 ## Connection
 
 See [connection board image](https://cdn.thingiverse.com/assets/5f/ee/44/74/92/IMG_5204.JPG) posted by [General5X](https://www.thingiverse.com/Generalx5)
+
 See [Trigorilla connections](https://cdn.thingiverse.com/assets/6f/1b/cd/c5/98/trigorilla.png) posted by [misterbig](https://www.thingiverse.com/misterbig)
 
 RepRap display J2 goes to Trigorilla EXP1
+
 RepRap display J3 goes to Trigorilla EXP2
+
 Connection board connector HUB is connected (it seems to be 2mm raster, I didn't have dupont wires for that :/ )
+
 Connection board pins PIN_19 .. PIN_3 are wired to Trigorilla limit switches D19 .. D3
+
 Connection board pins PIN_GROUND and PIN_A13 are wired to Trigorilla Temp sensors GDN and A13 (nozzle temp sensor)
+
 
 Make sure not to take out connectors in A14 and AUX. Some are hot glued to connection board.
 
