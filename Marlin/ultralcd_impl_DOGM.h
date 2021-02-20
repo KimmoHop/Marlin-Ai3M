@@ -603,7 +603,7 @@ void lcd_implementation_clear() { } // Automatically cleared by Picture Loop
               filename_scroll_hash = name_hash;                                 // Save the new hash
               filename_scroll_max = MAX(0, utf8_strlen(theCard.longFilename) - maxlen); // Update the scroll limit
               filename_scroll_pos = 0;                                          // Reset scroll to the start
-              lcd_status_update_delay = 8;                                      // Don't scroll right away
+              lcd_status_update_delay = 6;                                      // Don't scroll right away
             }
             outstr += filename_scroll_pos;
           }

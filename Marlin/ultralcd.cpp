@@ -5292,7 +5292,7 @@ void lcd_update() {
       // If scrolling of long file names is enabled and we are in the sd card menu,
       // cause a refresh to occur until all the text has scrolled into view.
       if (currentScreen == lcd_sdcard_menu && filename_scroll_pos < filename_scroll_max && !lcd_status_update_delay--) {
-        lcd_status_update_delay = 6;
+        lcd_status_update_delay = 5;
         lcdDrawUpdate = LCDVIEW_REDRAW_NOW;
         filename_scroll_pos++;
         return_to_status_ms = ms + LCD_TIMEOUT_TO_STATUS;
