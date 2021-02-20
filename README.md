@@ -5,11 +5,13 @@ Forked from [Anycubic i3 Mega / Mega-S Marlin 1.1.9 by davidramiro](https://gith
 ## Changes
 
 - Anycubic TFT display disabled
-- RepRapDiscoun full graphics enabled
+- RepRapDiscount full graphics enabled
 - SPI delay adjusted for clone with long cables
 - Serial buffers adjusted for lesser memory usage
 - M73 R support, displayed instead of X and Y cordinates
 - Manual level corners (moves from corner to corner)
+- Skew correction with gcode
+- File sorting with RAM cache -> fast file list scrolling
 
 ## Still works
 
