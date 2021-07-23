@@ -654,6 +654,7 @@ void do_blocking_move_to_xy(const float &rx, const float &ry, const float &fr_mm
   //estimated time to end of the print
   extern uint8_t print_percent_done_normal;
   extern uint16_t print_time_remaining_normal;
+  extern uint16_t print_time_to_change;
 #endif
 
 #endif // MARLIN_H

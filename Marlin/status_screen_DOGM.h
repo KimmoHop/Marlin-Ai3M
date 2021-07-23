@@ -196,6 +196,20 @@ inline void lcd_implementation_status_message(const bool blink) {
   #endif
 }
 
+#if ENABLED(FULL_M73_SUPPORT)
+inline uint16_t print_time_to_change_remaining() {
+  uint16_t print_t = print_time_to_change;
+  if (feedrate_percentage != 0) print_t = 100ul * print_t / feedrate_percentage;
+  return print_t;
+}
+
+inline uint16_t print_time_remaining() {
+  uint16_t print_t = print_time_remaining_normal;
+  if (feedrate_percentage != 0) print_t = 100ul * print_t / feedrate_percentage;
+  return print_t;
+}
+#endif
+
 static void lcd_implementation_status_screen() {
 
   const bool blink = lcd_blink();
@@ -438,26 +452,29 @@ static void lcd_implementation_status_screen() {
       #endif
 
       #if ENABLED(FULL_M73_SUPPORT)
-        if (print_time_remaining_normal != PRINT_TIME_REMAINING_INIT) {
-          uint16_t print_t = print_time_remaining_normal;
-          if (feedrate_percentage != 0) print_t = 100ul * print_t / feedrate_percentage;
-      
+        uint16_t print_t = PRINT_TIME_REMAINING_INIT;
+        char symbol = LCD_STR_CLOCK[0];
+        char suff_doubt = feedrate_percentage != 100 ? '?': ' ';
+        if(print_time_to_change != PRINT_TIME_REMAINING_INIT) {
+          print_t = print_time_to_change_remaining();
+          symbol = LCD_STR_ARROW_RIGHT[0];
+        } else if (print_time_remaining_normal != PRINT_TIME_REMAINING_INIT) {
+          print_t = print_time_remaining();
+        }
+        
+        if (IsRunning() && print_t != PRINT_TIME_REMAINING_INIT) {
           u8g.setPrintPos(0 * XYZ_SPACING + X_LABEL_POS, XYZ_BASELINE);
 
           char buffer[15];
           uint16_t hh = print_t / 60;
           uint8_t mm = print_t % 60;
-          char suff_doubt = feedrate_percentage != 100 ? '?': ' ';
-          bool has_days = print_t > (60*24);
 
-          if (has_days) {
-            uint16_t dd = print_t / 60 / 24;
-            sprintf_P(buffer, PSTR("%c %ud %2uh %c"), LCD_STR_CLOCK[0], dd, hh % 24, suff_doubt); // max 11
+          if (hh > 99) {
+            sprintf_P(buffer, PSTR("%c    %3uh %c"), symbol, hh, suff_doubt); // max 11
           } else {
-            sprintf_P(buffer, PSTR("%c %2uh %02um %c"), LCD_STR_CLOCK[0], hh, mm, suff_doubt); // max 11
+            sprintf_P(buffer, PSTR("%c %2uh %02um %c"), symbol, hh, mm, suff_doubt); // max 11
           }
           lcd_print(buffer);
-          
         } else {
 
       #endif

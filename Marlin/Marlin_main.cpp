@@ -8245,16 +8245,18 @@ inline void gcode_M42() {
   // storing estimated time to end of print counted by slicer
   uint8_t print_percent_done_normal = PRINT_PERCENT_DONE_INIT;
   uint16_t print_time_remaining_normal = PRINT_TIME_REMAINING_INIT; //estimated remaining print time in minutes
+  uint16_t print_time_to_change = PRINT_TIME_REMAINING_INIT; //estimated remaining time to next change in minutes
 
 /*!
 	### M73 - Set/get print progress <a href="https://reprap.org/wiki/G-code#M73:_Set.2FGet_build_percentage">M73: Set/Get build percentage</a>
 	#### Usage
     
-	    M73 [ P | R | Q | S ]
+	    M73 [ P | R | Q | S | C ]
     
 	#### Parameters
     - `P` - Percent in normal mode
     - `R` - Time remaining in normal mode
+    - `C` - Time to change/pause/user interaction
     No support for silent mode (Prusa)
    */
 	inline void gcode_M73() {
@@ -8267,6 +8269,13 @@ inline void gcode_M42() {
       print_time_remaining_normal = parser.ushortval('R', PRINT_TIME_REMAINING_INIT);
       NOMORE(print_time_remaining_normal, 65535);
     }
+
+    print_time_to_change = PRINT_TIME_REMAINING_INIT;
+    if (parser.seen('C')) {
+      print_time_remaining_normal = parser.ushortval('C', PRINT_TIME_REMAINING_INIT);
+      NOMORE(print_time_remaining_normal, 65535);
+    }
+
 	}
 #endif
 
@@ -9056,6 +9065,7 @@ inline void gcode_M18_M84() {
     #if ENABLED(FULL_M73_SUPPORT)
       print_time_remaining_normal = PRINT_TIME_REMAINING_INIT;
       print_percent_done_normal = PRINT_PERCENT_DONE_INIT;
+      print_time_to_change = PRINT_TIME_REMAINING_INIT;
     #endif
   }
 }
